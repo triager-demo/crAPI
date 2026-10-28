@@ -1,5 +1,7 @@
 """Exercise normal account, vehicle, community, and shop flows on a local stack."""
 import html
+from email import policy
+from email.parser import Parser
 import json
 import os
 import re
@@ -34,6 +36,7 @@ def request(path, data=None, token=None, base=BASE):
 def main():
     with urlopen(BASE, timeout=30) as response:
         assert "Vehicle services" in response.read().decode()
+    assert request("/chatbot/")["message"] == "Hello from chatbot!"
     suffix = uuid.uuid4().hex[:12]
     email = f"driver-{suffix}@example.com"
     password = "Driver!12345"
@@ -53,7 +56,13 @@ def main():
         messages = request("/api/v2/search?" + urlencode({
             "kind": "to", "query": email,
         }), base=MAIL)
-        bodies = " ".join(item["Content"]["Body"] for item in messages["items"])
+        bodies = []
+        for item in messages["items"]:
+            message = Parser(policy=policy.default).parsestr(item["Raw"]["Data"])
+            for part in message.walk():
+                if part.get_content_type() in ("text/html", "text/plain"):
+                    bodies.append(part.get_content())
+        bodies = " ".join(bodies)
         plain = html.unescape(re.sub(r"<[^>]+>", "", bodies))
         vin = re.search(r"VIN:\s*([A-Z0-9]+)", plain)
         pin = re.search(r"Pincode:\s*([0-9]+)", plain)
@@ -67,6 +76,19 @@ def main():
     vehicles = request("/identity/api/v2/vehicle/vehicles", token=token)
     assert vin.group(1) in json.dumps(vehicles), "Registered vehicle is missing"
     print("PASS mail delivery and vehicle registration")
+
+    mechanics = request("/workshop/api/mechanic", token=token)
+    assert "TRAC_JHN" in json.dumps(mechanics), "Seeded mechanic is missing"
+    problem = "Routine maintenance " + suffix
+    request("/workshop/api/merchant/contact_mechanic", {
+        "mechanic_code": "TRAC_JHN", "problem_details": problem,
+        "vin": vin.group(1),
+        "mechanic_api": BASE + "/workshop/api/mechanic/receive_report",
+        "repeat_request_if_failed": False, "number_of_repeats": 1,
+    }, token)
+    services = request("/workshop/api/merchant/service_requests/" + vin.group(1), token=token)
+    assert problem in json.dumps(services), "Service request is missing"
+    print("PASS mechanic directory, contact, and service history")
 
     title = "Road trip " + suffix
     request("/community/api/v2/community/posts", {
