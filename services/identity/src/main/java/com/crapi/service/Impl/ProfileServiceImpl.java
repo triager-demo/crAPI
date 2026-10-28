@@ -230,7 +230,7 @@ public class ProfileServiceImpl implements ProfileService {
               if (ProfileValidator.checkSpecialCharacter(profileVideo.getConversion_params())) {
                 return new CRAPIResponse(UserMessage.CONVERT_VIDEO_INTERNAL_ERROR, 500);
               }
-              return new CRAPIResponse(UserMessage.YOU_WON_THE_GAME, 200);
+              return new CRAPIResponse(UserMessage.CONVERT_VIDEO_COMPLETED, 200);
             }
             return new CRAPIResponse(UserMessage.CONVERT_VIDEO_INTERNAL_ERROR, 500);
           } else if (optionalProfileVideo.isPresent()

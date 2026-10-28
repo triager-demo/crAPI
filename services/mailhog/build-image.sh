@@ -15,7 +15,6 @@
 # limitations under the License.
 
 
-set -x 
-
-cd "$(dirname $0)"
-docker build -t crapi/mailhog:${VERSION:-latest} .
+set -eu
+cd "$(dirname "$0")/../../deploy/docker"
+docker compose build mailhog

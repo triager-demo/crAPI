@@ -1,4 +1,4 @@
-## Inbuilt User details to play around.
+## Built-in account directory
 
 \```markdown
 | Name  | Email                | Phone Number | Password    | Role            | SSN         |

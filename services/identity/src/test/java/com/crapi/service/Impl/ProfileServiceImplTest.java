@@ -291,7 +291,7 @@ public class ProfileServiceImplTest {
         HttpHeaders.HOST, "localhost:" + String.valueOf(System.getenv("SERVER_PORT")));
     Mockito.when(profileVideoRepository.findById(videoId)).thenReturn(Optional.of(profileVideo));
     CRAPIResponse crapiAPIResponse = profileService.convertVideo(videoId, request);
-    Assertions.assertEquals(UserMessage.YOU_WON_THE_GAME, crapiAPIResponse.getMessage());
+    Assertions.assertEquals(UserMessage.CONVERT_VIDEO_COMPLETED, crapiAPIResponse.getMessage());
     Assertions.assertEquals(HttpStatus.OK.value(), crapiAPIResponse.getStatus());
   }
 

@@ -13,15 +13,6 @@
 # limitations under the License.
 
 
-set -x
-cd "$(dirname $0)"
-mkdir -p retrieval
-cp -Rv ../../docs retrieval/
-cp -Rv ../../deploy/docker/*.yml retrieval/docs/
-
-docker build -t crapi/crapi-chatbot:${VERSION:-latest} .
-retVal=$?
-if [ $retVal -ne 0 ]; then
-    echo "Error building crapi-chatbot image"
-    exit $retVal
-fi
+set -eu
+cd "$(dirname "$0")/../../deploy/docker"
+docker compose build crapi-chatbot

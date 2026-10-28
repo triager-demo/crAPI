@@ -15,25 +15,25 @@
 package controllers
 
 import (
+	"encoding/json"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 )
 
 func TestServer_Home(t *testing.T) {
-	type args struct {
-		w http.ResponseWriter
-		r *http.Request
+	response := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodGet, "/", nil)
+	server := &Server{}
+	server.Home(response, request)
+	if response.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", response.Code, http.StatusOK)
 	}
-	tests := []struct {
-		name   string
-		server *Server
-		args   args
-	}{
-		// TODO: Add test cases.
+	var message string
+	if err := json.Unmarshal(response.Body.Bytes(), &message); err != nil {
+		t.Fatalf("invalid JSON response: %v", err)
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.server.Home(tt.args.w, tt.args.r)
-		})
+	if message != "Welcome To This crAPI API" {
+		t.Fatalf("unexpected home response: %q", message)
 	}
 }

@@ -14,11 +14,6 @@
 # limitations under the License.
 
 
-set -x
-cd "$(dirname $0)"
-docker build -t crapi/crapi-workshop:${VERSION:-latest} .
-retVal=$?
-if [ $retVal -ne 0 ]; then
-    echo "Error building crapi-workshop image"
-fi
-exit $retVal
+set -eu
+cd "$(dirname "$0")/../../deploy/docker"
+docker compose build crapi-workshop

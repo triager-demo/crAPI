@@ -13,12 +13,6 @@
 # limitations under the License.
 
 
-set -x
-set -e
-cd "$(dirname $0)"
-scripts=$(find ../../services/ -name 'build-image*.sh')
-for script in ${scripts}
-do
-    echo "Executing $script"
-    bash -x "$script"
-done
+set -eu
+cd "$(dirname "$0")"
+docker compose build "$@"

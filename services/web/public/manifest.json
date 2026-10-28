@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "crAPI",
+  "name": "crAPI Vehicle Services",
   "icons": [
     {
       "src": "images/favicon.ico",

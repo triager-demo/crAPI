@@ -1,4 +1,3 @@
 @echo off
-cd /d identity
-cmd /c docker build -t crapi/crapi-identity:%VERSION% .
-cd /d .\..\
+cd /d "%~dp0..\..\deploy\docker"
+docker compose build crapi-identity %*

@@ -66,7 +66,7 @@ interface ChatBotComponentProps {
 const ChatBotComponent: React.FC<ChatBotComponentProps> = (props) => {
   const [expanded, setExpanded] = useState<boolean>(false);
   const [chatResetKey, setChatResetKey] = useState<number>(0);
-  const helpOptions = ["Initialize", "Clear", "Help"];
+  const helpOptions = ["Connect assistant", "Clear", "Help"];
   const [apiKey, setApiKey] = useState("");
 
   const [chatbotState, setChatbotState] = useState<ChatBotState>({
@@ -241,14 +241,14 @@ const ChatBotComponent: React.FC<ChatBotComponentProps> = (props) => {
             return "chat";
           } else {
             await params.injectMessage(
-              "Chatbot is not initialized. Please choose an option:",
+              "Connect your OpenAI account to start using the vehicle assistant.",
             );
             return "show_options";
           }
         } catch (err) {
           console.error("Error checking initialization:", err);
           await params.injectMessage(
-            "Unable to check initialization status. Please choose an option:",
+            "Unable to check your assistant connection. Please try connecting again.",
           );
           return "show_options";
         }
@@ -265,9 +265,9 @@ const ChatBotComponent: React.FC<ChatBotComponentProps> = (props) => {
       chatDisabled: true,
       path: async (params: Params) => {
         switch (params.userInput) {
-          case "Initialize":
+          case "Connect assistant":
             await params.injectMessage(
-              "Please type your OpenAI API key below and enter 'Submit' in the chat to initialize the chatbot.",
+              "Enter your OpenAI API key, then select Submit to connect your assistant.",
             );
             return "initialize";
           case "Clear":
@@ -283,16 +283,16 @@ const ChatBotComponent: React.FC<ChatBotComponentProps> = (props) => {
             }
             return "show_options";
           case "Help":
-            await params.injectMessage(`**crAPI Chatbot Help**
+            await params.injectMessage(`**Vehicle assistant**
 
 **Available Commands:**
-- **Initialize**: Set up the chatbot with your OpenAI API key
+- **Connect assistant**: Connect using your OpenAI API key
 - **Clear**: Clear the chat history
 - **Help**: Show this help message
 
 **Usage:**
-1. First, initialize the chatbot with your OpenAI API key
-2. Once initialized, you can ask questions about crAPI
+1. Connect the assistant using your OpenAI API key
+2. Ask about your vehicles, maintenance, parts, or service requests
 3. Use the Clear option to reset your chat history
 
 What would you like to do next?`);
@@ -307,10 +307,12 @@ What would you like to do next?`);
       renderMarkdown: ["BOT"],
     },
     initialize: {
+      options: ["Submit"],
       component: (
         <input
           type="password"
-          placeholder="Please paste your OpenAI API key here"
+          aria-label="OpenAI API key"
+          placeholder="OpenAI API key"
           onChange={handleApiKey}
         />
       ),
@@ -318,13 +320,13 @@ What would you like to do next?`);
         const APIKey = apiKey.trim();
         if (!APIKey) {
           await params.injectMessage(
-            "API key cannot be empty. Please enter a valid OpenAI API key and enter 'Submit' in the chat.",
+            "Enter your OpenAI API key, then select Submit.",
           );
           return "initialize";
         }
         if (params.userInput.toLowerCase() !== "submit") {
           await params.injectMessage(
-            "Please type 'Submit' to confirm your API key.",
+            "Select Submit to connect your assistant.",
           );
           return;
         }
@@ -340,17 +342,17 @@ What would you like to do next?`);
 
           if (chatHistory.length > 0) {
             await params.simulateStreamMessage(
-              `✅ Chatbot initialized successfully! Loaded ${chatHistory.length} previous messages. You can now start chatting!`,
+              `Assistant connected. Loaded ${chatHistory.length} previous messages. How can I help with your vehicle?`,
             );
           } else {
             await params.injectMessage(
-              "✅ Chatbot initialized successfully! Ready to chat! Ask me anything about crAPI.",
+              "Your assistant is connected. Ask about your vehicles, maintenance, parts, or service requests.",
             );
           }
           return "chat";
         } else {
           await params.injectMessage(
-            "❌ Failed to initialize chatbot. Please check your API key and try again:",
+            "Unable to connect the assistant. Check your API key and try again.",
           );
           return "show_options";
         }
@@ -418,7 +420,7 @@ What would you like to do next?`);
           <span
             style={{ fontSize: "18px", fontWeight: "600", color: "#1f2937" }}
           >
-            crAPI ChatBot
+            Vehicle assistant
           </span>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <button
