@@ -36,7 +36,7 @@ public class UserMessage {
   public static final String NUMBER_ALREADY_REGISTERED = "Number already registered! Number: ";
   public static final String NUMBER_NOT_REGISTERED = "Given Number is not registered! Number:";
   public static final String CHANGE_PHONE_MESSAGE =
-      "The otp has been sent to your email. If you have used example.com email, check your email using the MailHog web portal.";
+      "A verification code has been sent to your email.";
   public static final String NUMBER_CHANGE_SUCCESSFUL = "Phone number change is successful";
   public static final String NEW_NUMBER_DOES_NOT_BELONG = "Fail, invalid new number";
   public static final String OLD_NUMBER_DOES_NOT_BELONG =
@@ -58,9 +58,9 @@ public class UserMessage {
   public static final String VEHICLE_SAVED_SUCCESSFULLY = "Vehicle saved successfully!";
   public static final String VEHICLE_NOT_FOUND = "Failed to get Vehicles";
   public static final String VEHICLE_DETAILS_SENT_TO_EMAIL =
-      "Your newly purchased vehicle details have been sent to you email address. Verify them to add your vehicle. [If you have used example.com email, check your email using the MailHog web portal]";
+      "Your vehicle details have been sent to your email address. Verify them to add your vehicle.";
   public static final String CHANGE_EMAIL_MESSAGE =
-      "The token has been sent to your email. If you have used example.com email, check your email using the MailHog web portal.   ";
+      "A verification token has been sent to your email.";
   public static final String CHANGE_EMAIL_OLD_USEREMAIL_NOT_FOUND_MESSAGE =
       "Sorry, we didn't find any user for ";
   public static final String INVALID_EMAIL_TOKEN = "Sorry, Token did't match";
@@ -75,7 +75,7 @@ public class UserMessage {
   public static final String VALID_JWT_TOKEN = "The token is a valid JWT token";
   public static final String INVALID_JWT_TOKEN = "The token is not a valid JWT token";
   public static final String TOKEN_VERIFICATION_FAILOLD =
-      "Our security team made us remove the \"Login with token\" feature because it's not secure enough. It's not available after API version 2.7";
+      "Login with token is unavailable after API version 2.7";
   public static final String TOKEN_VERIFICATION_MISSING = "Missing data. Field is null: ";
   public static final String DID_NOT_GET_VEHICLE_FOR_USER =
       "Sorry we didn't get vehicle for user: ";
@@ -85,18 +85,18 @@ public class UserMessage {
       "You have already uploaded a video. Please try with change video";
 
   public static final String CONVERT_VIDEO_INTERNAL_USE_ONLY =
-      "Thi-S endpoint S-hould be accessed only inte-Rnally. -Fine? , endpoint_url http://crapi-identity:"
+      "Video conversion is available through the internal service: http://crapi-identity:"
           + String.valueOf(System.getenv("SERVER_PORT"))
           + "/identity/api/v2/user/videos/convert_video";
   public static final String CONVERT_VIDEO_INTERNAL_ERROR = "Error occured while executing.";
-  public static final String CONVERT_VIDEO_CLOSE_TO_WIN_THE_GAME = "You are very close.";
+  public static final String CONVERT_VIDEO_PENDING = "Video conversion is pending.";
   public static final String CONVERT_VIDEO_BASH_COMMAND_TRIGGERED =
       "Video conversion command executed.";
   public static final String SORRY_DIDNT_GET_PROFILE =
       "Sorry, Didn't get any profile video name for the user.";
   public static final String THIS_IS_ADMIN_FUNCTION =
-      "This is an admin function. Try to access the admin API";
-  public static final String YOU_WON_THE_GAME = "You won the game.";
+      "Administrator access is required for this operation.";
+  public static final String CONVERT_VIDEO_COMPLETED = "Video conversion completed.";
   public static final String USER_VIDEO_NAME_CHANGED = "Video name changed successfully..";
   public static final String CONVERT_VIDEO_PARAM_IS_MISSING = "Video_id param is missing";
   public static final String ERROR_EXECUTING_STRING = "Error occured while executing.";
@@ -111,14 +111,5 @@ public class UserMessage {
   public static final String CUSTOM_IO_EXCEPTION_UNABLE_TO_CREATE_VEHICLE =
       "Sorry! Unable to create the vehicle";
   public static final String CONVERSION_VIDEO_OK =
-      "V09XLiBMb29rIGF0IHlvdS4gQ29tYmluaW5nIE1hc3MgQXNzaWdubWVudCBh"
-          + "bmQgU1NSRiB0byBleHBsb2l0IGEgaGlkZGVuIFNoZWxsIEluamVjdGlvbi4K"
-          + "V2UncmUgdmVyeSBwcm91ZC4gWW91IHdvbiB0aGUgZ2FtZS4gVW5mb3J0dW5h"
-          + "dGVseSwgd2UgZG9uJ3QgYWN0dWFsbHkgIAphbGxvdyBvdXIgcGVudGVzdGVy"
-          + "IHRvIHJ1biBhcmJpdHJhcnkgc2hlbGwgY29tbWFuZHMgb24gb3VyIGJhY2tl"
-          + "bmQgOiggCkl0IGNvdWxkIGJlIHZlcnkgZXhwZW5zaXZlIGFuZCBhbm5veWlu"
-          + "ZyB0byBtYWludGFpbiBpdC4gCkFueWhvdywgaWYgeW91IGhvc3QgeW91ciBv"
-          + "d24gaW5zdGFuY2Ugb2YgY3JBUEksIHlvdSBjYW4gc2ltcGx5IGNoYW5nZSB0"
-          + "aGUKYGJsb2NrX3NoZWxsX2luamVjdGlvbnNgIGZsYWcgaW4gdGhlIGNvbmZp"
-          + "ZyBmaWxlIHRvIGFsbG93IHJlYWwgc2hlbGwgaW5qZWN0aW9ucy4=";
+      "VmlkZW8gY29udmVyc2lvbiBpcyB1bmF2YWlsYWJsZSB3aXRoIHRoZSBjdXJyZW50IHNlcnZpY2UgY29uZmlndXJhdGlvbi4=";
 }

@@ -1,9 +1,8 @@
-docker save crapi/mailhog:develop -o mailhog.tar
-docker save crapi/gateway-service:develop -o gateway-service.tar
-docker save crapi/crapi-identity:develop -o crapi-identity.tar
-docker save crapi/crapi-community:develop -o crapi-community.tar
-docker save crapi/crapi-workshop:develop -o crapi-workshop.tar
-docker save crapi/crapi-chatbot:develop -o crapi-chatbot.tar
-docker save crapi/crapi-web:develop -o crapi-web.tar
-docker save postgres:14 -o postgres.tar
-docker save mongo:4.4 -o mongo.tar
+#!/bin/sh
+# Export the images used by the local Compose stack, including its dependencies.
+set -eu
+archive=${1:-crapi-images.tar}
+compose_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+images=$(docker compose --project-directory "$compose_dir" -f "$compose_dir/docker-compose.yml" config --images)
+# Compose emits one image reference per line; image references cannot contain spaces.
+docker image save -o "$archive" $images

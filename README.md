@@ -34,6 +34,8 @@ docker compose -p crapi-local -f deploy/docker/docker-compose.yml logs --tail=10
 docker compose -p crapi-local -f deploy/docker/docker-compose.yml down
 ```
 
+For offline transfer, run `sh deploy/docker/scripts/save.sh /path/to/crapi-images.tar` after building and starting the stack, then `sh deploy/docker/scripts/load.sh /path/to/crapi-images.tar` on the receiving machine. The archive includes application and dependency images.
+
 Named volumes retain data after shutdown. Add `-v` to `down` only when you want to discard local data and reseed.
 
 ## Configuration
