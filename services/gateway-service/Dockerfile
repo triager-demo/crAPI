@@ -9,11 +9,9 @@ COPY . ./
 # Build the binary.
 RUN go build -v -o server
 
-RUN wget https://github.com/minio/certgen/releases/latest/download/certgen-linux-amd64 -O /tmp/certgen \
-    && chmod +x /tmp/certgen
-
-RUN /tmp/certgen -host "127.0.0.1,gateway-service,api.mypremiumdealership.com,mypremiumdealership.com"
-RUN ls -la
+RUN openssl req -x509 -newkey rsa:2048 -nodes -days 3650 \
+    -keyout private.key -out public.crt -subj "/CN=api.mypremiumdealership.com" \
+    -addext "subjectAltName=IP:127.0.0.1,DNS:gateway-service,DNS:api.mypremiumdealership.com,DNS:mypremiumdealership.com"
 
 FROM debian:bookworm-slim
 SHELL ["/bin/bash", "-c"]

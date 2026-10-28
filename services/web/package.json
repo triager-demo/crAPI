@@ -1,7 +1,7 @@
 {
   "name": "crapi-web",
   "version": "0.1.0",
-  "proxy": "https://crapi.allvapps.com",
+  "proxy": "http://localhost:8888",
   "private": true,
   "dependencies": {
     "@ant-design/cssinjs": "^1.21.1",
@@ -49,8 +49,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "prettier --check src/**/*.{js,jsx,ts,tsx}",
-    "lint:fix": "prettier --write src/**/*.{js,jsx,ts,tsx}"
+    "lint": "prettier --check \"src/**/*.{js,jsx,ts,tsx}\"",
+    "lint:fix": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\""
   },
   "eslintConfig": {
     "extends": [
@@ -82,5 +82,6 @@
   },
   "browser": {
     "crypto": false
-  }
+  },
+  "description": "Vehicle ownership, maintenance, parts, and community portal"
 }

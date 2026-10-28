@@ -1,11 +1,11 @@
 {
   "openapi" : "3.0.1",
   "info" : {
-    "title" : "OWASP crAPI API",
+    "title" : "crAPI Vehicle Services API",
     "version" : "1-oas3"
   },
   "externalDocs" : {
-    "description" : "Completely Ridiculous API (crAPI)",
+    "description" : "crAPI automotive services — based on OWASP crAPI",
     "url" : "https://github.com/OWASP/crAPI"
   },
   "servers" : [ {

@@ -17,10 +17,9 @@ FROM node:20 AS build
 RUN mkdir /app
 WORKDIR /app
 COPY ./*.json /app/
-RUN npm install --silent
+RUN npm ci --silent
 COPY ./src /app/src
 COPY ./public /app/public
-RUN cp ./src/config.js.template ./src/config.js
 RUN NODE_OPTIONS=--max_old_space_size=4096 npm run build
 RUN ls /app/build
 

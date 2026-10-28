@@ -1,0 +1,184 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, 'codex/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web-lint:
+    name: Web lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: services/web/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+
+  web-build:
+    name: Web build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: services/web/package-lock.json
+      - run: npm ci
+      - run: npm run build
+        env:
+          CI: 'false' # CRA emits existing ESLint warnings; compilation errors still fail.
+
+  identity-tests:
+    name: Identity tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew test --no-daemon
+        working-directory: services/identity
+
+  identity-lint:
+    name: Identity lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew spotlessCheck --no-daemon
+        working-directory: services/identity
+
+  go-checks:
+    name: Go ${{ matrix.check }}
+    strategy:
+      fail-fast: false
+      matrix:
+        check: [test, vet, build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          cache-dependency-path: |
+            services/community/go.sum
+            services/gateway-service/go.sum
+      - name: Check both Go services
+        run: |
+          for service in community gateway-service; do
+            (cd services/"$service" && go ${{ matrix.check }} ./...)
+          done
+
+  chatbot-tests:
+    name: Chatbot tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pytest==8.3.5
+      - run: python -m pytest services/chatbot/src/chatbot/tests -q
+        env:
+          PYTHONPATH: services/chatbot/src
+      - run: python -m compileall -q services/chatbot/src services/workshop
+
+  workshop-tests:
+    name: Workshop tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: sudo apt-get update && sudo apt-get install -y libcairo2-dev pkg-config libpq-dev
+      - run: pip install -r services/workshop/requirements.txt -r services/workshop/dev-requirements.txt
+      - run: docker compose -p crapi-tests -f services/docker-database.yml up -d --wait --wait-timeout 180
+      - run: |
+          source .env
+          IS_TESTING=True python manage.py test --no-input
+        working-directory: services/workshop
+      - if: failure()
+        run: docker compose -p crapi-tests -f services/docker-database.yml logs
+      - if: always()
+        run: docker compose -p crapi-tests -f services/docker-database.yml down -v
+
+  docker-build:
+    name: Docker build (${{ matrix.service }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [identity, community, workshop, chatbot, web, mailhog, gateway-service]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: services/${{ matrix.service }}
+          push: false
+          load: true
+          tags: crapi-ci/${{ matrix.service }}:local
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+      - run: docker save crapi-ci/${{ matrix.service }}:local | gzip > /tmp/image.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: image-${{ matrix.service }}
+          path: /tmp/image.tar.gz
+          retention-days: 1
+
+  integration:
+    name: Application integration
+    needs: docker-build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: image-*
+          path: /tmp/crapi-images
+      - name: Load validated local images
+        run: |
+          for archive in /tmp/crapi-images/image-*/image.tar.gz; do
+            docker load -i "$archive"
+          done
+          for service in identity community workshop chatbot web; do
+            docker tag crapi-ci/$service:local crapi-local/crapi-$service:local
+          done
+          for service in mailhog gateway-service; do
+            docker tag crapi-ci/$service:local crapi-local/$service:local
+          done
+      - run: docker compose -p crapi-ci -f deploy/docker/docker-compose.yml up -d --no-build --wait --wait-timeout 300
+      - run: python3 scripts/smoke.py
+      - if: failure()
+        run: docker compose -p crapi-ci -f deploy/docker/docker-compose.yml logs
+      - if: always()
+        run: docker compose -p crapi-ci -f deploy/docker/docker-compose.yml down -v
